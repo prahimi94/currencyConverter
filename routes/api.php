@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CurrencyRestController;
-use App\Http\Controllers\CurrencyGraphController;
+use App\Http\Controllers\CurrencyGraphqlController;
 
 
 
@@ -11,6 +11,7 @@ Route::prefix('rest')->group(function () {
     Route::post('/convert', [CurrencyRestController::class, 'convert']);
 });
 
-Route::prefix('graph')->group(function () {
-    Route::post('/convert', [CurrencyGraphController::class, 'convert']);
+Route::prefix('graphql')->group(function () {
+    Route::get('/currencies', [CurrencyGraphqlController::class, 'currencies']);
+    Route::post('/convert', [CurrencyGraphqlController::class, 'convert']);
 });
