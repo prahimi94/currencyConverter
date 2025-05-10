@@ -5,7 +5,6 @@ use App\Http\Controllers\CurrencyRestController;
 use App\Http\Controllers\CurrencyGraphqlController;
 
 
-
 Route::prefix('rest')->group(function () {
     Route::get('/currencies', [CurrencyRestController::class, 'currencies']);
     Route::post('/convert', [CurrencyRestController::class, 'convert']);

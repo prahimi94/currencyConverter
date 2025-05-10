@@ -13,10 +13,11 @@ abstract class Controller
         try {
             $apiKey = env('EXCHANGE_RATE_API_KEY');
             $apiUrl = env('EXCHANGE_RATE_API_URL');
+
             $url = $apiUrl . $uri;
 
             $curl = curl_init();
-
+            
             curl_setopt_array($curl, array(
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
@@ -33,10 +34,11 @@ abstract class Controller
                 'Accept: application/json',
                 ),
             ));
-
+            
             $response = curl_exec($curl);
 
             curl_close($curl);
+            
             return ['success'=> true, 'data'=> json_decode($response, true), 'message'=> null];
         } catch (\Throwable $th) {
             return ['success'=> false, 'data'=> null, 'message'=> $th->getMessage()];

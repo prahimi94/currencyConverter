@@ -12,7 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->append(\App\Http\Middleware\CsrfTokenHandler::class);
+        $middleware->append(\App\Http\Middleware\CspHandler::class); //for Content Security Policy (CSP)
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
