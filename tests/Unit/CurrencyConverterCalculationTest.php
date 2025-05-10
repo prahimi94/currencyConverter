@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-use App\Http\Controllers\ConvertRequest;
 use App\Http\Controllers\CurrencyController;
 use PHPUnit\Framework\TestCase;
 

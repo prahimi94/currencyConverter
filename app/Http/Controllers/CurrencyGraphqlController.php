@@ -24,12 +24,13 @@ class CurrencyGraphqlController extends CurrencyController
         if($response['success'] == false) {
             return $this->output(false, null, $response['message']);
         }
-        if (isset($response['data']['currencies'])) {
-            $response = $response['data']['currencies'];
+        $currencies = $response['data'];
+        if (isset($currencies['data']['currencies'])) {
+            $currencies = $currencies['data']['currencies'];
         } else {
             return $this->output(false, null, 'No data found');
         }
-        return $this->output($response['success'], $response['data'], $response['message']);
+        return $this->output($response['success'], $currencies, $response['message']);
     }
 
     public function convert(ConvertCurrencyRequest $request)
