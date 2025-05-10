@@ -51,7 +51,6 @@ class CurrencyGraphqlControllerTest extends TestCase
 
     public function test_rates_correct_result(): void
     {
-        
         Http::fake([
             $apiUrl = env('EXCHANGE_RATE_API_URL') . '*' => Http::response([
                 'data' => [
@@ -92,6 +91,54 @@ class CurrencyGraphqlControllerTest extends TestCase
                     'success' => true,
                     'data' => 113.43,
                     'message' => null
+                ]);
+    }
+
+    public function test_convert_validation_error(): void
+    {
+        Http::fake([
+            $apiUrl = env('EXCHANGE_RATE_API_URL') . '*' => Http::response([
+                'data' => [
+                    'latest' => [
+                        [
+                            "base_currency" => "EUR",
+                            "quote_currency" => "AED",
+                            "quote" => 4.171335,
+                            "date" => "2025-05-05"  
+                        ],
+                        [
+                            "base_currency" => "EUR",
+                            "quote_currency" => "USD",
+                            "quote" => 1.1343,
+                            "date" => "2025-05-05"
+                        ],
+                        [
+                            "base_currency" => "EUR",
+                            "quote_currency" => "AFN",
+                            "quote" => 80.566756,
+                            "date" => "2025-05-05"
+                        ],
+                    ]
+                ]
+            ], 200)
+        ]);
+        $this->withoutMiddleware(\App\Http\Middleware\CsrfTokenHandler::class);
+
+        $response = $this->postJson('/api/graphql/convert', [
+            'from' => 'EUR',
+            'to' => 'USD',
+            'amount' => -20
+        ]);
+
+        // $this->assertTrue(true);
+        $response->assertStatus(422)
+                ->assertJson([
+                    'message' => "Amount must be greater than 0.",
+                    "errors" => [
+                        "amount" => [
+                            "Amount must be greater than 0."
+                        ]
+                    ]
                 ]);
     }
 }

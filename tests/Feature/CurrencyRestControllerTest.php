@@ -85,4 +85,48 @@ class CurrencyRestControllerTest extends TestCase
                     'message' => null
                 ]);
     }
+
+    public function test_convert_validation_error(): void
+    {
+        Http::fake([
+            $apiUrl = env('EXCHANGE_RATE_API_URL') . '*' => Http::response([
+                [
+                    "base_currency" => "EUR",
+                    "quote_currency" => "AED",
+                    "quote" => 4.171335,
+                    "date" => "2025-05-05"  
+                ],
+                [
+                    "base_currency" => "EUR",
+                    "quote_currency" => "USD",
+                    "quote" => 1.1343,
+                    "date" => "2025-05-05"
+                ],
+                [
+                    "base_currency" => "EUR",
+                    "quote_currency" => "AFN",
+                    "quote" => 80.566756,
+                    "date" => "2025-05-05"
+                ],
+            ], 200)
+        ]);
+        $this->withoutMiddleware(\App\Http\Middleware\CsrfTokenHandler::class);
+
+        $response = $this->postJson('/api/rest/convert', [
+            'from' => 'EUR',
+            'to' => 'US',
+            'amount' => 100
+        ]);
+
+        // $this->assertTrue(true);
+        $response->assertStatus(422)
+                ->assertJson([
+                    'message' => "Destination currency must be 3 characters long.",
+                    "errors" => [
+                        "to" => [
+                            "Destination currency must be 3 characters long."
+                        ]
+                    ]
+                ]);
+    }
 }
