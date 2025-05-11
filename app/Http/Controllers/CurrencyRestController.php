@@ -32,7 +32,7 @@ class CurrencyRestController extends CurrencyController
         $from = $data['from'];
         $to = $data['to'];
         if($from == $to) {
-            return $this->output(false, null, 'from and to currencies are the same');
+            return $this->output(false, null, 'From and to currencies are the same');
         }
         $amount = $data['amount'];
         $ratesRes = $this->getRates();

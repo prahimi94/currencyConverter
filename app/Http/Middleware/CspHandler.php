@@ -19,12 +19,13 @@ class CspHandler
         if (app()->environment('local')) {
             $response->headers->set('Content-Security-Policy',
                 "default-src 'self'; " .
-                "script-src 'self' 'unsafe-inline' http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173; " .
-                "script-src-elem 'self' 'unsafe-inline' http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173; " .
-                "style-src 'self' 'unsafe-inline' http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173; " .
-                "style-src-elem 'self' 'unsafe-inline' http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173; " .
+                "script-src 'self' 'unsafe-inline' http://localhost:5173 http://127.0.0.1:5173 https://unpkg.com; " .
+                "script-src-elem 'self' 'unsafe-inline' http://localhost:5173 http://127.0.0.1:5173 https://unpkg.com; " .
+                "style-src 'self' 'unsafe-inline' http://localhost:5173 http://127.0.0.1:5173 https://fonts.googleapis.com https://fonts.gstatic.com; " .
+                "style-src-elem 'self' 'unsafe-inline' http://localhost:5173 http://127.0.0.1:5173 https://fonts.googleapis.com https://fonts.gstatic.com; " .
                 "connect-src 'self' ws://localhost:5173 ws://127.0.0.1:5173 http://localhost:5173 http://127.0.0.1:5173; " .
-                "img-src 'self' data:;"
+                "img-src 'self' data:;" .
+                "font-src 'self' 'unsafe-inline' http://localhost:5173 http://127.0.0.1:5173 https://fonts.googleapis.com https://fonts.gstatic.com; "
             );
         } else {
             $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");

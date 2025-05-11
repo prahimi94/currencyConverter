@@ -49,7 +49,7 @@ class CurrencyGraphqlController extends CurrencyController
         $from = $data['from'];
         $to = $data['to'];
         if($from == $to) {
-            return $this->output(false, null, 'from and to currencies are the same');
+            return $this->output(false, null, 'From and to currencies are the same');
         }
         $amount = $data['amount'];
         $ratesRes = $this->getRates();
@@ -93,7 +93,7 @@ class CurrencyGraphqlController extends CurrencyController
         } else {
             return $this->output(false, null, 'No data found');
         }
-        
+
         Cache::put($cacheKey, $rates, 600);
 
         return ['success'=> $response['success'], 'data'=> $rates, 'message'=> $response['message']];

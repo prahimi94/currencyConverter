@@ -1,11 +1,197 @@
-@import 'tailwindcss';
+/* @import 'tailwindcss'; */
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php'; */
+/* @source '../**//*.blade.php'; */
+/* @source '../**//*.js'; */
 
-@theme {
+/* @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+} */
+
+*, ::after, ::before {
+    box-sizing: border-box;
 }
+body{
+  margin: 0;
+  padding: 0;
+}
+body::before {
+  --size: 45px;
+  --line: color-mix(in hsl, canvasText, transparent 80%);
+  content: "";
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  background: linear-gradient(
+        90deg,
+        var(--line) 1px,
+        transparent 1px var(--size)
+      )
+      calc(var(--size) * 0.36) 50% / var(--size) var(--size),
+    linear-gradient(var(--line) 1px, transparent 1px var(--size)) 0%
+      calc(var(--size) * 0.32) / var(--size) var(--size);
+  mask: linear-gradient(-20deg, transparent 50%, white);
+  top: 0;
+  transform-style: flat;
+  pointer-events: none;
+  z-index: -1;
+}
+.BG{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100vw;
+  z-index: 1;
+}
+.copyright{
+  margin: 2rem 0;
+  padding: 1rem 0;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+  z-index: 2;
+  font-family: "Dongle", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  color: rgb(64, 64, 64);
+  font-size: 1.35rem;
+}
+.copyright span{
+  font-size: .85rem;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100dvh; 
+    max-width: 100vw;
+}
+.card {
+    width: 40vw;
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(1px);
+    border: 1px solid rgba(229, 229, 229, 0.7);
+    padding: 1.5rem;
+    border-radius: 26px;
+    position: relative;
+    z-index: 3;
+}
+.card .title{
+  text-align: center;
+  font-family: "Dongle", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 4rem;
+  margin: 0 0 1rem 0;
+  background: radial-gradient(circle, #5ec0e8, #c7f9ba);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.input{
+  width: 100%;
+  padding: 8px;
+  border: 1px solid rgba(210, 210, 210, 0.85);
+  border-radius: 12px;
+  margin: 0 0 0.5rem;
+  color: rgb(64, 64, 64);
+}
+.input:focus, .input:focus-visible{
+  border: 2px solid rgba(121, 121, 121, 0.85);
+}
+.btn{
+  background: #5EC0E8;
+  background: -webkit-linear-gradient(45deg,rgba(94, 192, 232, 1) 0%, rgba(199, 249, 186, 1) 100%);
+  background: -moz-linear-gradient(45deg,rgba(94, 192, 232, 1) 0%, rgba(199, 249, 186, 1) 100%);
+  background: linear-gradient(45deg,rgba(94, 192, 232, 1) 0%, rgba(199, 249, 186, 1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(
+    startColorstr="#5EC0E8",
+    endColorstr="#C7F9BA",
+    GradientType=0
+  );
+  padding: 2px 3px;
+  border: 1px solid rgba(210, 210, 210, 0.75);
+  border-radius: 12px;
+  margin: 0.5rem 0;
+  color: rgb(64, 64, 64);
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.5s ease-in-out; 
+  text-align: center;
+  font-family: "Dongle", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.75rem;
+}
+.btn:hover{
+  background: #5EC0E8;
+  background: -webkit-linear-gradient(145deg,rgba(94, 192, 232, 1) 0%, rgba(199, 249, 186, 1) 100%);
+  background: -moz-linear-gradient(145deg,rgba(94, 192, 232, 1) 0%, rgba(199, 249, 186, 1) 100%);
+  background: linear-gradient(145deg,rgba(94, 192, 232, 1) 0%, rgba(199, 249, 186, 1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(
+    startColorstr="#5EC0E8",
+    endColorstr="#C7F9BA",
+    GradientType=0
+  );
+}
+
+.select-form {
+  padding: 10px;
+  font-size: 16px;
+  width: 100%;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+.select-form .vs__search::placeholder{
+  color: rgb(168, 168, 168);
+  font-size: 14px;
+}
+.select-form .vs__dropdown-toggle{
+  margin: 0 0 0.5rem;
+  padding: 2px;
+  background: #ffffff;
+  border: 1px solid rgba(210, 210, 210, 0.85);
+  color: rgb(64, 64, 64);
+  border-radius: 12px;
+}
+.select-form .vs__dropdown-menu {
+  background: #ffffff;
+  border: 1px solid rgba(210, 210, 210, 0.85);
+  color: rgb(64, 64, 64);
+  border-radius: 12px;
+  margin-top: 1px;
+}
+
+.select-form .vs__clear,
+.select-form .vs__open-indicator {
+  fill: #5ec0e8;
+}
+
+.select-form option[disabled] {
+  color: #999;
+}
+
+@media (min-width:320px)  { 
+  .card {
+    width: 80vw;
+  }
+ }
+
+@media (min-width:641px)  { 
+   .card {
+     width: 60vw;
+   }
+  }
+
+@media (min-width:1025px) { 
+  .card {
+    width: 40vw;
+  }
+ }
