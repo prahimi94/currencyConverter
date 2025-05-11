@@ -4,15 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\ConvertRequest;
 use App\Http\Requests\ConvertCurrencyRequest;
+use Illuminate\Support\Facades\Cache;
 
 class CurrencyRestController extends CurrencyController
 {
     public function currencies()
     {
+        $cacheKey = "currencies";
+        $cachedCurrencies = Cache::get($cacheKey);
+        if ($cachedCurrencies) {
+            return $this->output(true, $cachedCurrencies);
+        }
+
         $response = $this->callApi('/rest/currencies');
         if($response['success'] == false) {
             return $this->output(false, null, $response['message']);
         }
+
+        Cache::put($cacheKey, $response['data'], 600);
+
         return $this->output($response['success'], $response['data'], $response['message']);
     }
 
@@ -40,10 +50,19 @@ class CurrencyRestController extends CurrencyController
     }
 
     private function getRates(){
+        $cacheKey = "rates";
+        $cachedRates = Cache::get($cacheKey);
+        if ($cachedRates) {
+            return ['success'=> true, 'data'=> $cachedRates, 'message'=> ''];
+        }
+
         $response = $this->callApi('/rest/rates');
         if($response['success'] == false) {
             return $this->output(false, null, $response['message']);
         }
+
+        Cache::put($cacheKey, $response['data'], 600);
+        
         return ['success'=> $response['success'], 'data'=> $response['data'], 'message'=> $response['message']];
     }
     

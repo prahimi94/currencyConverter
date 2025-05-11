@@ -4,11 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\ConvertRequest;
 use App\Http\Requests\ConvertCurrencyRequest;
+use Illuminate\Support\Facades\Cache;
 
 class CurrencyGraphqlController extends CurrencyController
 {
     public function currencies()
     {
+        $cacheKey = "currencies";
+        $cachedCurrencies = Cache::get($cacheKey);
+        if ($cachedCurrencies) {
+            return $this->output(true, $cachedCurrencies);
+        }
+
         $query = json_encode([
             'query' => 'query {
                 currencies {
@@ -30,6 +37,9 @@ class CurrencyGraphqlController extends CurrencyController
         } else {
             return $this->output(false, null, 'No data found');
         }
+
+        Cache::put($cacheKey, $currencies, 600);
+
         return $this->output($response['success'], $currencies, $response['message']);
     }
 
@@ -47,12 +57,6 @@ class CurrencyGraphqlController extends CurrencyController
             return $this->output(false, null, $ratesRes['message']);
         }
         $rates = $ratesRes['data'];
-
-        if (isset($rates['data']['latest'])) {
-            $rates = $rates['data']['latest'];
-        } else {
-            return $this->output(false, null, 'No data found');
-        }
         
         $convertedAmount = $this->calculate($rates, $from, $to, $amount);
         if ($convertedAmount === null) {
@@ -63,6 +67,12 @@ class CurrencyGraphqlController extends CurrencyController
     }
 
     private function getRates(){
+        $cacheKey = "rates";
+        $cachedRates = Cache::get($cacheKey);
+        if ($cachedRates) {
+            return ['success'=> true, 'data'=> $cachedRates, 'message'=> ''];
+        }
+
         $query = json_encode([
             'query' => 'query {
                 latest {
@@ -77,6 +87,15 @@ class CurrencyGraphqlController extends CurrencyController
         if($response['success'] == false) {
             return $this->output(false, null, $response['message']);
         }
-        return ['success'=> $response['success'], 'data'=> $response['data'], 'message'=> $response['message']];
+        $rates = $response['data'];
+        if (isset($rates['data']['latest'])) {
+            $rates = $rates['data']['latest'];
+        } else {
+            return $this->output(false, null, 'No data found');
+        }
+        
+        Cache::put($cacheKey, $rates, 600);
+
+        return ['success'=> $response['success'], 'data'=> $rates, 'message'=> $response['message']];
     }
 }
