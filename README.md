@@ -1,61 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Currency Conversion Service
+This project is a service that provides conversions of amounts in one currency to another currency using real-time conversion rates as provided by [Swop.cx](https://swop.cx/). The service is programmed with PHP (Laravel framework) including caching, validation and testing for better performance. It is built with Docker for consistent deployment from development, to staging, to production. Additional security measures, including CSRF and CSP, have been implemented.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Features
+- Currency conversion based on real-time exchange rates from [Swop.cx](https://swop.cx/)
+- Input validation and error handling
+- Caching for improved performance
+- CSRF and CSP security protections
+- Dockerized application for easy deployment
+- Vue.js user interface for smooth interactions with the currency conversion service
+- Format output using [Web i18n](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) framework
 
-## About Laravel
+## Technologies Used
+- PHP (Framework of choice)
+- Vue.js
+- Docker (Alpine-based images)
+- InfluxDB & Grafana
+- CSRF & CSP for security
+- Redis (for caching)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Setup and Installation
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Prerequisites
+- PHP (version 8.x or above)
+- Composer
+- Node.js (for Vue.js)
+- Docker
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/prahimi94/currencyConverter
+cd currencyConverter
+```
 
-## Learning Laravel
+# 2. Install PHP Dependencies
+Run the following command to install PHP dependencies:
+```bash
+composer install
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# 3. Install Vue.js Dependencies
+Run the following command to install Vue.js dependencies:
+```bash
+npm install
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# 4. Configure Environment
+Make a .env as a copy of .env.example file. Make sure to configure the .env file with the necessary API keys and settings, including:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Swop.cx API key
 
-## Laravel Sponsors
+Redis configuration
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+InfluxDB and Grafana connection details
 
-### Premium Partners
+# 5. Run the Application with Docker
+You can run the application in a Docker container for consistent deployment:
+```bash
+docker-compose up
+```
+This will start both the backend(Laravel) and frontend services(Vue.js). The project will be available at http://localhost:8080.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+# 6. Access the Currency Conversion API
+To interact with the API, you can leverage both Rest and Graphql Apis. 
 
-## Contributing
+## Rest api's example:
+Currenies: **Get** request to **"/api/rest/currencies"** endpoint.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Convert: **Post** request to **"/api/rest/convert"** endpoint.
+Request Format:
+```bash
+{
+    "from": "CHF",
+    "to": "UYU",
+    "amount": 20
+}
+```
+Example Request:
+```bash
+curl --location 'http://127.0.0.1:8000/api/rest/convert' \
+--header 'Accept: application/json' \
+--header 'X-CSRF-TOKEN: LlAD3q15iIPw3NvoBrhLPmo7yVor6wufMjSEFHo3' \
+--header 'Content-Type: application/json' \
+--data '{
+    "from": "CHF",
+    "to": "UYU",
+    "amount": 20
+}'
+```
+Example Request:
+```bash
+{
+    "success": true,
+    "data": 1014.19,
+    "message": null
+}
+```
 
-## Code of Conduct
+## Graphqls api's example:
+Currenies: **Get** request to **"/api/graphql/currencies"** endpoint.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Convert: **Post** request to **"/api/graphql/convert"** endpoint.
 
-## Security Vulnerabilities
+**Request and response format are the same with Rest apis.**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 7. Security
+CSRF protection is enabled for API requests.
 
-## License
+CSP headers are set to protect against cross-site scripting (XSS) attacks.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 8. Testing
+Run tests to ensure the correctness of the service:
+```bash
+php artisan test
+```
