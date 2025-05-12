@@ -20,8 +20,6 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install && npm install && npm run build
-
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
