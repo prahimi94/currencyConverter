@@ -21,4 +21,11 @@ export default defineConfig({
         vue(),
         tailwindcss(),
     ],
+    vue: {
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag === 'dotlottie-player'
+        }
+      }
+    }
 });

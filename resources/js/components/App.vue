@@ -20,7 +20,7 @@
         <input class="input" type="text" placeholder="Amount" ref="amount"/>
       </div>
       <div>
-        <select v-model="fromCurrency" id="currenciesFrom" :options="options" placeholder="FROM ..." class="select-form">
+        <select v-model="fromCurrency" id="currenciesFrom" placeholder="FROM ..." class="select-form">
           <option disabled value="">FROM ...</option>
           <option v-for="option in options" :key="option.id" :value="option.id">
             {{ option.name }}
@@ -28,7 +28,7 @@
         </select>
       </div>
       <div>
-        <select v-model="toCurrency" id="currenciesTo" :options="options" placeholder="TO ..." class="select-form">
+        <select v-model="toCurrency" id="currenciesTo" placeholder="TO ..." class="select-form">
           <option disabled value="">To ...</option>
           <option v-for="option in options" :key="option.id" :value="option.id">
             {{ option.name }}
@@ -48,6 +48,7 @@
   
   <script>
   import { useToast } from 'vue-toastification';
+
   const toast = useToast();
 
   export default {
