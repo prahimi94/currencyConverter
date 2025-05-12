@@ -50,8 +50,6 @@ Swop.cx API key
 
 Redis configuration
 
-InfluxDB and Grafana connection details
-
 # 5. Run the Application with Docker
 You can run the application in a Docker container for consistent deployment:
 ```bash
