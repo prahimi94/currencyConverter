@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: laravel-vue-app
+    container_name: currency-app
     ports:
       - "8083:8083"     # Laravel
       - "5173:5173"     # Vite (Vue.js)
