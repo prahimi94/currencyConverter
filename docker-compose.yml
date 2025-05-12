@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-vue-app
+    ports:
+      - "8000:8000"     # Laravel
+      - "5173:5173"     # Vite
+    volumes:
+      - .:/var/www/html
+    networks:
+      - laravelnet
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: laravel-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - laravelnet
+
+networks:
+  laravelnet:
+    driver: bridge
+
+volumes:
+  redis-data:
