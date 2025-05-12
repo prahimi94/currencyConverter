@@ -14,7 +14,6 @@ This project is a service that provides conversions of amounts in one currency t
 - PHP (Framework of choice)
 - Vue.js
 - Docker (Alpine-based images)
-- InfluxDB & Grafana
 - CSRF & CSP for security
 - Redis (for caching)
 
