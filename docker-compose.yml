@@ -5,8 +5,8 @@ services:
       dockerfile: Dockerfile
     container_name: laravel-vue-app
     ports:
-      - "8000:8000"     # Laravel
-      - "5173:5173"     # Vite
+      - "8083:8083"     # Laravel
+      - "5173:5173"     # Vite (Vue.js)
     volumes:
       - .:/var/www/html
     networks:
