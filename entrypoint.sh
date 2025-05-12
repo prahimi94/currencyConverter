@@ -11,6 +11,11 @@ if [ ! -f ".env" ]; then
   cp .env.example .env
 fi
 
+# Create SQLite DB file if it doesn't exist
+if [ ! -f "database/database.sqlite" ]; then
+  touch database/database.sqlite
+fi
+
 
 # run laravel initialization commands
 php artisan key:generate
