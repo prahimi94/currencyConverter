@@ -55,7 +55,7 @@ You can run the application in a Docker container for consistent deployment:
 ```bash
 docker-compose up
 ```
-This will start both the backend(Laravel) and frontend services(Vue.js). The project will be available at http://localhost:8080.
+This will start both the backend(Laravel) and frontend services(Vue.js). The project will be available at http://localhost:8083.
 
 # 6. Access the Currency Conversion API
 To interact with the API, you can leverage both Rest and Graphql Apis. 
