@@ -1,12 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Services;
+use App\Services\Contracts\CurrencyServiceInterface;
 
-use Illuminate\Http\Request;
-
-class CurrencyController extends Controller
+class CurrencyService implements CurrencyServiceInterface
 {
-    public function calculate($rates, $from, $to, $amount) {
+    /**
+     * Create a new class instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    public function calculate(array $rates, string $from, string $to, float $amount): float{
         $rateFound = false;
         $rateValue = 0;
         $convertedAmount = 0;
@@ -22,6 +29,9 @@ class CurrencyController extends Controller
                 break;
             }
         }
+        $rateValueA = null;
+        $rateValueB = null;
+
         if($rateFound) {
             $convertedAmount = $amount * $rateValue;
         } else {
@@ -33,8 +43,14 @@ class CurrencyController extends Controller
                 if ($rate['base_currency'] == 'EUR' && $rate['quote_currency'] == $to) {
                     $rateValueB = $rate['quote'];
                 }
+                if ($rateValueA !== null && $rateValueB !== null) {
+                    break;
+                }
             }
 
+            if ($rateValueA == null || $rateValueB == null) {
+                throw new \InvalidArgumentException('Conversion rate not found for the given currencies.');
+            }
 
             $convertedAmount = $amount * $rateValueA * $rateValueB;
         }

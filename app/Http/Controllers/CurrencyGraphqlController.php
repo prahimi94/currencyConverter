@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\ConvertRequest;
+use App\Services\Contracts\CurrencyServiceInterface;
 use App\Http\Requests\ConvertCurrencyRequest;
 use Illuminate\Support\Facades\Cache;
 
-class CurrencyGraphqlController extends CurrencyController
+class CurrencyGraphqlController extends Controller
 {
+
+    public function __construct(protected CurrencyServiceInterface $currencyService) {}
+
     public function currencies()
     {
         $cacheKey = "currencies";
@@ -58,7 +61,7 @@ class CurrencyGraphqlController extends CurrencyController
         }
         $rates = $ratesRes['data'];
         
-        $convertedAmount = $this->calculate($rates, $from, $to, $amount);
+        $convertedAmount = $this->currencyService->calculate($rates, $from, $to, $amount);
         if ($convertedAmount === null) {
             return $this->output(false, null, 'Conversion failed');
         }

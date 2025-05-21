@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Http\Controllers\CurrencyController;
 use PHPUnit\Framework\TestCase;
+use App\Services\CurrencyService;
 
 class CurrencyConverterCalculationTest extends TestCase
 {
@@ -25,12 +25,12 @@ class CurrencyConverterCalculationTest extends TestCase
      */
     public function test_calculate_currency_in_rates(): void
     {
-        $currencyController = new CurrencyController();
+        $currencyService = new CurrencyService();
         $rates = $this->rates;
         $from = 'EUR';
         $to = 'USD';
         $amount = 100;
-        $result = $currencyController->calculate($rates, $from, $to, $amount);
+        $result = $currencyService->calculate($rates, $from, $to, $amount);
 
         $this->assertEquals(112.52, $result);
     }
@@ -38,36 +38,36 @@ class CurrencyConverterCalculationTest extends TestCase
 
     public function test_calculate_currency_not_in_rates(): void
     {
-        $currencyController = new CurrencyController();
+        $currencyService = new CurrencyService();
         $rates = $this->rates;
         $from = 'USD';
         $to = 'GBP';
         $amount = 100;
-        $result = $currencyController->calculate($rates, $from, $to, $amount);
+        $result = $currencyService->calculate($rates, $from, $to, $amount);
 
         $this->assertEquals(75.35, $result);
     }
 
     public function test_calculate_zero_amount(): void
     {
-        $currencyController = new CurrencyController();
+        $currencyService = new CurrencyService();
         $rates = $this->rates;
         $from = 'USD';
         $to = 'GBP';
         $amount = 0;
-        $result = $currencyController->calculate($rates, $from, $to, $amount);
+        $result = $currencyService->calculate($rates, $from, $to, $amount);
 
         $this->assertEquals(0, $result);
     }
 
     public function test_calculate_minus_amount(): void
     {
-        $currencyController = new CurrencyController();
+        $currencyService = new CurrencyService();
         $rates = $this->rates;
         $from = 'USD';
         $to = 'GBP';
         $amount = -100;
-        $result = $currencyController->calculate($rates, $from, $to, $amount);
+        $result = $currencyService->calculate($rates, $from, $to, $amount);
 
         $this->assertEquals(-75.35, $result);
     }
