@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Currency;
+use App\DTO\Rate;
 use App\Services\Contracts\CurrencyServiceInterface;
 use App\Services\Contracts\CallApiServiceInterface;
 use App\Http\Requests\ConvertCurrencyRequest;
@@ -28,7 +30,7 @@ class CurrencyRestController extends Controller
                 return new ApiResponse(true, $cachedCurrencies);
             }
 
-            $response = $this->callApiService->callApi('/rest/currencies');
+            $response = $this->callApiService->callApi(uri: '/rest/currencies', dtoClass: Currency::class);
 
             Cache::put($cacheKey, $response, config('cache.ttl'));
 
@@ -63,7 +65,7 @@ class CurrencyRestController extends Controller
                 return $cachedRates;
             }
 
-            $response = $this->callApiService->callApi('/rest/rates');
+            $response = $this->callApiService->callApi(uri: '/rest/rates', dtoClass: Rate::class);
 
             Cache::put($cacheKey, $response, config('cache.ttl'));
 
@@ -72,5 +74,4 @@ class CurrencyRestController extends Controller
             throw($th);
         }
     }
-    
 }

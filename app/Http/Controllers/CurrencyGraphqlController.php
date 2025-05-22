@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Currency;
+use App\DTO\Rate;
 use App\Services\Contracts\CurrencyServiceInterface;
 use App\Services\Contracts\CallApiServiceInterface;
 use App\Http\Requests\ConvertCurrencyRequest;
@@ -38,18 +40,11 @@ class CurrencyGraphqlController extends Controller
                     }
                 }'
             ]);
-            $response = $this->callApiService->callApi('/graphql', 'POST', $query);
+            $response = $this->callApiService->callApi(uri: '/graphql', method: 'POST', data: $query, dtoClass: Currency::class, dataPath: 'data.currencies');
             
-            $currencies = $response['data'];
-            if (isset($currencies['currencies'])) {
-                $currencies = $currencies['currencies'];
-            } else {
-                return new ApiResponse(false, null, 'No data found', JsonResponse::HTTP_BAD_GATEWAY);
-            }
-
             Cache::put($cacheKey, $response, config('cache.ttl'));
 
-            return new ApiResponse(true, $currencies, '');
+            return new ApiResponse(true, $response, '');
         } catch (\Throwable $th) {
             return $this->exceptionHandler->handle($th);
         }
@@ -90,18 +85,11 @@ class CurrencyGraphqlController extends Controller
                     }
                 }'
             ]);
-            $response = $this->callApiService->callApi('/graphql', 'POST', $query);
+            $response = $this->callApiService->callApi(uri: '/graphql', method: 'POST', data: $query, dtoClass: Rate::class, dataPath: 'data.latest');
             
-            $rates = $response['data'];
-            if (isset($rates['latest'])) {
-                $rates = $rates['latest'];
-            } else {
-                throw new \Exception('No data found');
-            }
-
             Cache::put($cacheKey, $response, config('cache.ttl'));
 
-            return $rates;
+            return $response;
         } catch (\Throwable $th) {
             throw($th);
         }

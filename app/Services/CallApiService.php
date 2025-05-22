@@ -16,7 +16,7 @@ class CallApiService implements CallApiServiceInterface
         //
     }
 
-    public function callApi(string $uri, string $method = "GET", ?string $data = null)
+    public function callApi(string $uri, string $method = "GET", ?string $data = null, ?string $dtoClass = null, ?string $dataPath = null)
     {
         try {
             $apiKey = env('EXCHANGE_RATE_API_KEY');
@@ -41,7 +41,27 @@ class CallApiService implements CallApiServiceInterface
                 throw new RequestException($response);
             }
             
-            return $response->json();
+            $responseData = $response->json();
+
+            if ($dataPath) {
+                foreach (explode('.', $dataPath) as $key) {
+                    if (isset($responseData[$key])) {
+                        $responseData = $responseData[$key];
+                    } else {
+                        throw new \RuntimeException("Key '{$key}' not found in response.");
+                    }
+                }
+            }
+            
+            if ($dtoClass) {
+                if(is_array(($responseData))) {
+                    return array_map(fn ($data) => new $dtoClass(...$data), $responseData);
+                } else {
+                    return new $dtoClass(...$responseData);
+                }
+            }
+
+            return $responseData;
         } catch (\Throwable $th) {
             throw new \RuntimeException('API call failed: ' . $th->getMessage(), 0, $th);
         }
