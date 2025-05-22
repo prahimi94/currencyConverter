@@ -3,102 +3,107 @@
 namespace App\Http\Controllers;
 
 use App\Services\Contracts\CurrencyServiceInterface;
+use App\Services\Contracts\CallApiServiceInterface;
 use App\Http\Requests\ConvertCurrencyRequest;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Responses\ApiResponse;
+use Illuminate\Http\JsonResponse;
+use App\Services\ExceptionHandlerService;
 
 class CurrencyGraphqlController extends Controller
 {
-
-    public function __construct(protected CurrencyServiceInterface $currencyService) {}
+    public function __construct(
+        protected CurrencyServiceInterface $currencyService, 
+        protected CallApiServiceInterface $callApiService,
+        protected ExceptionHandlerService $exceptionHandler
+    ) {}
 
     public function currencies()
     {
-        $cacheKey = "currencies";
-        $cachedCurrencies = Cache::get($cacheKey);
-        if ($cachedCurrencies) {
-            return $this->output(true, $cachedCurrencies);
-        }
+        try{
+            $cacheKey = "currencies";
+            $cachedCurrencies = Cache::get($cacheKey);
+            if ($cachedCurrencies) {
+                return new ApiResponse(true, $cachedCurrencies);
+            }
 
-        $query = json_encode([
-            'query' => 'query {
-                currencies {
-                    code
-                    numeric_code: numericCode
-                    decimal_digits: decimalDigits
-                    name
-                    active
-                }
-            }'
-        ]);
-        $response = $this->callApi('/graphql', 'POST', $query);
-        if($response['success'] == false) {
-            return $this->output(false, null, $response['message']);
-        }
-        $currencies = $response['data'];
-        if (isset($currencies['data']['currencies'])) {
-            $currencies = $currencies['data']['currencies'];
-        } else {
-            return $this->output(false, null, 'No data found');
-        }
+            $query = json_encode([
+                'query' => 'query {
+                    currencies {
+                        code
+                        numeric_code: numericCode
+                        decimal_digits: decimalDigits
+                        name
+                        active
+                    }
+                }'
+            ]);
+            $response = $this->callApiService->callApi('/graphql', 'POST', $query);
+            
+            $currencies = $response['data'];
+            if (isset($currencies['currencies'])) {
+                $currencies = $currencies['currencies'];
+            } else {
+                return new ApiResponse(false, null, 'No data found', JsonResponse::HTTP_BAD_GATEWAY);
+            }
 
-        Cache::put($cacheKey, $currencies, 600);
+            Cache::put($cacheKey, $currencies, 600);
 
-        return $this->output($response['success'], $currencies, $response['message']);
+            return new ApiResponse(true, $currencies, '');
+        } catch (\Throwable $th) {
+            return $this->exceptionHandler->handle($th);
+        }
     }
 
     public function convert(ConvertCurrencyRequest $request)
     {
-        $data = $request->validated();
-        $from = $data['from'];
-        $to = $data['to'];
-        if($from == $to) {
-            return $this->output(false, null, 'From and to currencies are the same');
+        try {
+            $data = $request->validated();
+            $from = $data['from'];
+            $to = $data['to'];
+            $amount = $data['amount'];
+
+            $ratesRes = $this->getRates();        
+            $convertedAmount = $this->currencyService->calculate($ratesRes, $from, $to, $amount);
+
+            return new ApiResponse(true, $convertedAmount);
+        } catch (\Throwable $th) {
+            return $this->exceptionHandler->handle($th);
         }
-        $amount = $data['amount'];
-        $ratesRes = $this->getRates();
-        if($ratesRes['success'] == false) {
-            return $this->output(false, null, $ratesRes['message']);
-        }
-        $rates = $ratesRes['data'];
-        
-        $convertedAmount = $this->currencyService->calculate($rates, $from, $to, $amount);
-        if ($convertedAmount === null) {
-            return $this->output(false, null, 'Conversion failed');
-        }
-        
-        return $this->output(true, $convertedAmount);
     }
 
     private function getRates(){
-        $cacheKey = "rates";
-        $cachedRates = Cache::get($cacheKey);
-        if ($cachedRates) {
-            return ['success'=> true, 'data'=> $cachedRates, 'message'=> ''];
-        }
+        try{
+            $cacheKey = "rates";
+            $cachedRates = Cache::get($cacheKey);
+            if ($cachedRates) {
+                return $cachedRates;
+            }
 
-        $query = json_encode([
-            'query' => 'query {
-                latest {
-                    date
-                    base_currency: baseCurrency
-                    quote_currency: quoteCurrency
-                    quote
-                }
-            }'
-        ]);
-        $response = $this->callApi('/graphql', 'POST', $query);
-        if($response['success'] == false) {
-            return $this->output(false, null, $response['message']);
-        }
-        $rates = $response['data'];
-        if (isset($rates['data']['latest'])) {
-            $rates = $rates['data']['latest'];
-        } else {
-            return $this->output(false, null, 'No data found');
-        }
+            $query = json_encode([
+                'query' => 'query {
+                    latest {
+                        date
+                        base_currency: baseCurrency
+                        quote_currency: quoteCurrency
+                        quote
+                    }
+                }'
+            ]);
+            $response = $this->callApiService->callApi('/graphql', 'POST', $query);
+            
+            $rates = $response['data'];
+            if (isset($rates['latest'])) {
+                $rates = $rates['latest'];
+            } else {
+                throw new \Exception('No data found');
+            }
 
-        Cache::put($cacheKey, $rates, 600);
+            Cache::put($cacheKey, $rates, 600);
 
-        return ['success'=> $response['success'], 'data'=> $rates, 'message'=> $response['message']];
+            return $rates;
+        } catch (\Throwable $th) {
+            throw($th);
+        }
     }
 }
