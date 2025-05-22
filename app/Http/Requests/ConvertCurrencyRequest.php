@@ -29,6 +29,16 @@ class ConvertCurrencyRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $data = $validator->getData();
+            if (isset($data['from'], $data['to']) && $data['from'] === $data['to']) {
+                $validator->errors()->add('to', 'The source and target currencies must be different.');
+            }
+        });
+    }
+
     public function messages()
     {
         return [
