@@ -34,7 +34,7 @@ class ConvertCurrencyRequest extends FormRequest
         $validator->after(function ($validator) {
             $data = $validator->getData();
             if (isset($data['from'], $data['to']) && $data['from'] === $data['to']) {
-                $validator->errors()->add('to', 'The source and target currencies must be different.');
+                $validator->errors()->add('to', 'From and to currencies must be different.');
             }
         });
     }
