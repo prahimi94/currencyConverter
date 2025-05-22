@@ -47,7 +47,7 @@ class CurrencyGraphqlController extends Controller
                 return new ApiResponse(false, null, 'No data found', JsonResponse::HTTP_BAD_GATEWAY);
             }
 
-            Cache::put($cacheKey, $currencies, 600);
+            Cache::put($cacheKey, $response, config('cache.ttl'));
 
             return new ApiResponse(true, $currencies, '');
         } catch (\Throwable $th) {
@@ -99,7 +99,7 @@ class CurrencyGraphqlController extends Controller
                 throw new \Exception('No data found');
             }
 
-            Cache::put($cacheKey, $rates, 600);
+            Cache::put($cacheKey, $response, config('cache.ttl'));
 
             return $rates;
         } catch (\Throwable $th) {

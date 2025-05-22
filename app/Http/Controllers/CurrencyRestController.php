@@ -7,9 +7,7 @@ use App\Services\Contracts\CallApiServiceInterface;
 use App\Http\Requests\ConvertCurrencyRequest;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Responses\ApiResponse;
-use Illuminate\Http\JsonResponse;
 use App\Services\ExceptionHandlerService;
-use Illuminate\Validation\ValidationException;
 
 
 class CurrencyRestController extends Controller
@@ -32,7 +30,7 @@ class CurrencyRestController extends Controller
 
             $response = $this->callApiService->callApi('/rest/currencies');
 
-            Cache::put($cacheKey, $response, 600);
+            Cache::put($cacheKey, $response, config('cache.ttl'));
 
             return new ApiResponse(true, $response, '');
         } catch (\Throwable $th) {
@@ -67,7 +65,7 @@ class CurrencyRestController extends Controller
 
             $response = $this->callApiService->callApi('/rest/rates');
 
-            Cache::put($cacheKey, $response, 600);
+            Cache::put($cacheKey, $response, config('cache.ttl'));
 
             return $response;
         } catch (\Throwable $th){
