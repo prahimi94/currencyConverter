@@ -33,6 +33,11 @@ class ExceptionHandlerService implements ExceptionHandlerInterface
         return new ApiResponse(false, null, $th->getMessage(), JsonResponse::HTTP_BAD_REQUEST); // 400
     }
 
+    public function report(Throwable $e, Request $request)
+    {
+        $this->logException($e, $request);
+    }
+
     protected function logException(Throwable $th, ?Request $request = null): void
     {
         // Log the request and response in the custom log channel created in config/logging.php
