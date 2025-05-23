@@ -28,11 +28,11 @@ class CallApiService implements CallApiServiceInterface
                 'Authorization' => 'ApiKey ' . $apiKey,
                 'Accept' => 'application/json',
             ];
-            
+                        
             if ($method === 'GET') {
-                $response = Http::withHeaders($headers)->get($url, $data);
+                $response = Http::withInfluxLogging()->withHeaders($headers)->get($url, $data);
             } else {
-                $response = Http::withHeaders($headers)->send($method, $url, [
+                $response = Http::withInfluxLogging()->withHeaders($headers)->send($method, $url, [
                     'body' => $data,
                 ]);
             }
