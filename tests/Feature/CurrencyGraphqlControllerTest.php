@@ -133,12 +133,9 @@ class CurrencyGraphqlControllerTest extends TestCase
         // $this->assertTrue(true);
         $response->assertStatus(422)
                 ->assertJson([
-                    'message' => "Amount must be greater than 0.",
-                    "errors" => [
-                        "amount" => [
-                            "Amount must be greater than 0."
-                        ]
-                    ]
+                    'success' => false,
+                    'data' => null,
+                    'message' => "Validation error: Amount must be greater than 0."
                 ]);
     }
 }

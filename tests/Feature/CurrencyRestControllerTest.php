@@ -121,12 +121,9 @@ class CurrencyRestControllerTest extends TestCase
         // $this->assertTrue(true);
         $response->assertStatus(422)
                 ->assertJson([
-                    'message' => "Destination currency must be 3 characters long.",
-                    "errors" => [
-                        "to" => [
-                            "Destination currency must be 3 characters long."
-                        ]
-                    ]
+                    'success' => false,
+                    'data' => null,
+                    'message' => "Validation error: Destination currency must be 3 characters long.",
                 ]);
     }
 }
