@@ -38,8 +38,10 @@ class CurrencyService implements CurrencyServiceInterface
             }
         }
 
-        if ($rateValueA == null || $rateValueB == null) {
-            throw new \InvalidArgumentException('Conversion rate not found for the given currencies.');
+        if ($rateValueA == null) {
+            throw new \InvalidArgumentException('Conversion rate not found for the currency: '. $from);
+        } else if ($rateValueB == null) {
+            throw new \InvalidArgumentException('Conversion rate not found for the currency: '. $to);
         }
 
         $convertedAmount = $amount * $rateValueA * $rateValueB;

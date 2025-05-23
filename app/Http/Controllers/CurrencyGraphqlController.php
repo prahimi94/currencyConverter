@@ -63,7 +63,7 @@ class CurrencyGraphqlController extends Controller
 
             return new ApiResponse(true, $convertedAmount);
         } catch (\Throwable $th) {
-            return $this->exceptionHandler->handle($th);
+            return $this->exceptionHandler->handle($th, $request);
         }
     }
 
