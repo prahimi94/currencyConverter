@@ -5,8 +5,9 @@ namespace App\Services;
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;
+use App\Services\Contracts\RequestLoggerInterface;
 
-class InfluxService
+class RequestInfluxLoggerService implements RequestLoggerInterface
 {
     protected $client;
     protected $writeApi;
@@ -27,23 +28,9 @@ class InfluxService
         $this->org = env('INFLUXDB_ORG');
     }
 
-    public function writeRequestLog($method, $url, $requestData, $responseData, $duration)
+    public function logRequest($measurement, $method, $url, $requestData, $responseData, $duration):void
     {
-        $point = Point::measurement('http_requests')
-            ->addTag('method', $method)
-            ->addTag('url', (string) $url)
-            ->addTag('request', substr(json_encode($requestData), 0, 1000))
-            ->addTag('response', substr(json_encode($responseData), 0, 1000))
-            ->addField('duration', (float) $duration)
-            ->time(now(), WritePrecision::S);
-
-        $this->writeApi->write($point, WritePrecision::S, $this->bucket, $this->org);
-    }
-
-    
-    public function writeApiCallLog($url, $method, $requestData, $responseData, $duration)
-    {
-        $point = Point::measurement('api_calls')
+        $point = Point::measurement($measurement)
             ->addTag('method', $method)
             ->addTag('url', (string) $url)
             ->addTag('request', substr(json_encode($requestData), 0, 1000))

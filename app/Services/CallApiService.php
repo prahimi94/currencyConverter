@@ -30,9 +30,9 @@ class CallApiService implements CallApiServiceInterface
             ];
                         
             if ($method === 'GET') {
-                $response = Http::withInfluxLogging()->withHeaders($headers)->get($url, $data);
+                $response = Http::withRequestLogging()->withHeaders($headers)->get($url, $data);
             } else {
-                $response = Http::withInfluxLogging()->withHeaders($headers)->send($method, $url, [
+                $response = Http::withRequestLogging()->withHeaders($headers)->send($method, $url, [
                     'body' => $data,
                 ]);
             }

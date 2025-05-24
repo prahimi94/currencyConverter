@@ -5,13 +5,12 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Services\InfluxService;
-use Illuminate\Support\Facades\Log;
+use App\Services\Contracts\RequestLoggerInterface;
 
 class LogRequestResponse
 {
 
-    public function __construct(protected InfluxService $influx)
+    public function __construct(protected RequestLoggerInterface $logger)
     {
     }
 
@@ -28,7 +27,8 @@ class LogRequestResponse
 
         $duration = microtime(true) - $start;
 
-        $this->influx->writeRequestLog(
+        $this->logger->logRequest(
+            $this->logger::HTTP_REQUESTS_LOG_KEY,
             $request->method(),
             $request->fullUrl(),
             $request->all(),

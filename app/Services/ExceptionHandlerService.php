@@ -11,12 +11,17 @@ use RuntimeException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Services\Contracts\ExceptionLoggerInterface;
 
 class ExceptionHandlerService implements ExceptionHandlerInterface
 {
+    public function __construct(protected ExceptionLoggerInterface $logger)
+    {
+    }
+
     public function handle(Throwable $th, ?Request $request = null): ApiResponse
     {
-        $this->logException($th, $request);
+        $this->logger->logException($th, $request);
 
         if ($th instanceof ValidationException) {
             return new ApiResponse(false, null, 'Validation error: ' . $th->getMessage(), JsonResponse::HTTP_UNPROCESSABLE_ENTITY); // 422
@@ -35,20 +40,6 @@ class ExceptionHandlerService implements ExceptionHandlerInterface
 
     public function report(Throwable $e, Request $request)
     {
-        $this->logException($e, $request);
-    }
-
-    protected function logException(Throwable $th, ?Request $request = null): void
-    {
-        // Log the request and response in the custom log channel created in config/logging.php
-        Log::channel('exceptionLogs')->error('Exception occurred', [
-            'message' => $th->getMessage(),
-            'exception' => get_class($th),
-            'url' => optional($request)->fullUrl(),
-            'method' => optional($request)->method(),
-            'input' => optional($request)->all(),
-            'file' => $th->getFile(),
-            'line' => $th->getLine(),
-        ]);
+        $this->logger->logException($e, $request);
     }
 }
