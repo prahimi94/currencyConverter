@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'influxdb' => [
+        'url' => env('APP_ENV') === 'production'
+            ? env('INFLUXDB_URL_PRODUCTION')
+            : env('INFLUXDB_URL_LOCAL'),
+        'token' => env('INFLUXDB_TOKEN'),
+        'org' => env('INFLUXDB_ORG'),
+        'bucket' => env('INFLUXDB_BUCKET'),
+    ],
 ];

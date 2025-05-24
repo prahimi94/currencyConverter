@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 
 class ConvertCurrencyRequest extends FormRequest
 {
@@ -28,6 +29,16 @@ class ConvertCurrencyRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $data = $validator->getData();
+            if (isset($data['from'], $data['to']) && $data['from'] === $data['to']) {
+                $validator->errors()->add('to', 'From and to currencies must be different.');
+            }
+        });
+    }
+
     public function messages()
     {
         return [
@@ -41,5 +52,10 @@ class ConvertCurrencyRequest extends FormRequest
             'amount.numeric' => 'Amount must be a number.',
             'amount.min' => 'Amount must be greater than 0.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        //I needed to override this method to return a custom response beased on exception handler service
     }
 }

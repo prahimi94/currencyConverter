@@ -2,68 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\ConvertRequest;
+use App\DTO\Currency;
+use App\DTO\Rate;
+use App\Services\Contracts\CurrencyServiceInterface;
+use App\Services\Contracts\CallApiServiceInterface;
 use App\Http\Requests\ConvertCurrencyRequest;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Responses\ApiResponse;
+use App\Services\ExceptionHandlerService;
 
-class CurrencyRestController extends CurrencyController
+
+class CurrencyRestController extends Controller
 {
+    public function __construct(
+        protected CurrencyServiceInterface $currencyService, 
+        protected CallApiServiceInterface $callApiService,
+        protected ExceptionHandlerService $exceptionHandler
+    ) {
+    }
+    
     public function currencies()
     {
-        $cacheKey = "currencies";
-        $cachedCurrencies = Cache::get($cacheKey);
-        if ($cachedCurrencies) {
-            return $this->output(true, $cachedCurrencies);
+        try{
+            $cacheKey = "currencies";
+            $cachedCurrencies = Cache::get($cacheKey);
+            if ($cachedCurrencies) {
+                return new ApiResponse(true, $cachedCurrencies);
+            }
+
+            $response = $this->callApiService->callApi(uri: '/rest/currencies', dtoClass: Currency::class);
+
+            Cache::put($cacheKey, $response, config('cache.ttl'));
+
+            return new ApiResponse(true, $response, '');
+        } catch (\Throwable $th) {
+            return $this->exceptionHandler->handle($th);
         }
-
-        $response = $this->callApi('/rest/currencies');
-        if($response['success'] == false) {
-            return $this->output(false, null, $response['message']);
-        }
-
-        Cache::put($cacheKey, $response['data'], 600);
-
-        return $this->output($response['success'], $response['data'], $response['message']);
     }
 
     public function convert(ConvertCurrencyRequest $request)
     {
-        $data = $request->validated();
-        $from = $data['from'];
-        $to = $data['to'];
-        if($from == $to) {
-            return $this->output(false, null, 'From and to currencies are the same');
-        }
-        $amount = $data['amount'];
-        $ratesRes = $this->getRates();
-        if($ratesRes['success'] == false) {
-            return $this->output(false, null, $ratesRes['message']);
-        }
-        $rates = $ratesRes['data'];
+        try {
+            $data = $request->validated();
+            $from = $data['from'];
+            $to = $data['to'];
+            $amount = $data['amount'];
 
-        $convertedAmount = $this->calculate($rates, $from, $to, $amount);
-        if ($convertedAmount === null) {
-            return $this->output(false, null, 'Conversion failed');
+            $ratesRes = $this->getRates();
+            $convertedAmount = $this->currencyService->calculate($ratesRes, $from, $to, $amount);
+        
+            return new ApiResponse(true, $convertedAmount);
+        } catch (\Throwable $th) {
+            return $this->exceptionHandler->handle($th, $request);
         }
-
-        return $this->output(true, $convertedAmount);
     }
 
     private function getRates(){
-        $cacheKey = "rates";
-        $cachedRates = Cache::get($cacheKey);
-        if ($cachedRates) {
-            return ['success'=> true, 'data'=> $cachedRates, 'message'=> ''];
-        }
+        try {
+            $cacheKey = "rates";
+            $cachedRates = Cache::get($cacheKey);
+            if ($cachedRates) {
+                return $cachedRates;
+            }
 
-        $response = $this->callApi('/rest/rates');
-        if($response['success'] == false) {
-            return $this->output(false, null, $response['message']);
-        }
+            $response = $this->callApiService->callApi(uri: '/rest/rates', dtoClass: Rate::class);
 
-        Cache::put($cacheKey, $response['data'], 600);
-        
-        return ['success'=> $response['success'], 'data'=> $response['data'], 'message'=> $response['message']];
+            Cache::put($cacheKey, $response, config('cache.ttl'));
+
+            return $response;
+        } catch (\Throwable $th){
+            throw($th);
+        }
     }
-    
 }
