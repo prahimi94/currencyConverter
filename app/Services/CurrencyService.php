@@ -16,36 +16,42 @@ class CurrencyService implements CurrencyServiceInterface
 
     public function calculate(array $rates, string $from, string $to, float $amount): float
     {
-        foreach ($rates as $rate) {
-            if ($rate->base_currency == $from && $rate->quote_currency == $to) {
-                return $this->roundResult($amount * $rate->quote);
-            } else if ($rate->base_currency == $to && $rate->quote_currency == $from) {
-                return $this->roundResult($amount / $rate->quote);
+        try {
+            foreach ($rates as $rate) {
+                if ($rate->base_currency == $from && $rate->quote_currency == $to) {
+                    return $this->roundResult($amount * $rate->quote);
+                } else if ($rate->base_currency == $to && $rate->quote_currency == $from) {
+                    return $this->roundResult($amount / $rate->quote);
+                }
             }
-        }
 
-        $rateValueA = null;
-        $rateValueB = null;
-        foreach ($rates as $rate) {
-            if ($rate->base_currency == 'EUR' && $rate->quote_currency == $from) {
-                $rateValueA = 1 / $rate->quote;
+            $rateValueA = null;
+            $rateValueB = null;
+            foreach ($rates as $rate) {
+                if ($rate->base_currency == 'EUR' && $rate->quote_currency == $from) {
+                    $rateValueA = 1 / $rate->quote;
+                }
+                if ($rate->base_currency == 'EUR' && $rate->quote_currency == $to) {
+                    $rateValueB = $rate->quote;
+                }
+                if ($rateValueA !== null && $rateValueB !== null) {
+                    break;
+                }
             }
-            if ($rate->base_currency == 'EUR' && $rate->quote_currency == $to) {
-                $rateValueB = $rate->quote;
-            }
-            if ($rateValueA !== null && $rateValueB !== null) {
-                break;
-            }
-        }
 
-        if ($rateValueA == null) {
-            throw new \InvalidArgumentException('Conversion rate not found for the currency: '. $from);
-        } else if ($rateValueB == null) {
-            throw new \InvalidArgumentException('Conversion rate not found for the currency: '. $to);
-        }
+            if ($rateValueA == null) {
+                throw new \InvalidArgumentException('Conversion rate not found for the currency: '. $from);
+            } else if ($rateValueB == null) {
+                throw new \InvalidArgumentException('Conversion rate not found for the currency: '. $to);
+            }
 
-        $convertedAmount = $amount * $rateValueA * $rateValueB;
-        return $this->roundResult($convertedAmount);
+            $convertedAmount = $amount * $rateValueA * $rateValueB;
+            return $this->roundResult($convertedAmount);
+        }
+        catch (\Throwable $th) {
+            // Handle the exception as needed
+            throw new \RuntimeException('Error calculating currency conversion: ' . $th->getMessage());
+        }
     }
 
     private function roundResult(float $input): float

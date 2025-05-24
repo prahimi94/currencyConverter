@@ -11,14 +11,19 @@ class ExceptionFileLoggerService implements ExceptionLoggerInterface
 {
     public function logException(Throwable $th, ?Request $request = null): void
     {
-        Log::channel('exceptionLogs')->error('Exception occurred', [
-            'message' => $th->getMessage(),
-            'exception' => get_class($th),
-            'url' => optional($request)->fullUrl(),
-            'method' => optional($request)->method(),
-            'input' => optional($request)->all(),
-            'file' => $th->getFile(),
-            'line' => $th->getLine(),
-        ]);
+        try {
+            // Log the exception details to a specific channel
+            Log::channel('exceptionLogs')->error('Exception occurred', [
+                'message' => $th->getMessage(),
+                'exception' => get_class($th),
+                'url' => optional($request)->fullUrl(),
+                'method' => optional($request)->method(),
+                'input' => optional($request)->all(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+            ]);
+        } catch (Throwable $th) {
+            
+        }
     }
 }
