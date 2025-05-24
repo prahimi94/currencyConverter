@@ -19,15 +19,15 @@ class RequestInfluxLoggerService implements RequestLoggerInterface
     {
         try {
             $this->client = new Client([
-                "url" => env('INFLUXDB_URL'),
-                "token" => env('INFLUXDB_TOKEN'),
-                "bucket" => env('INFLUXDB_BUCKET'),
-                "org" => env('INFLUXDB_ORG')
+                'url' => config('services.influxdb.url'),
+                "token" => config('services.influxdb.token'),
+                "bucket" => config('services.influxdb.bucket'),
+                "org" => config('services.influxdb.org')
             ]);
 
             $this->writeApi = $this->client->createWriteApi();
-            $this->bucket = env('INFLUXDB_BUCKET');
-            $this->org = env('INFLUXDB_ORG');
+            $this->bucket = config('services.influxdb.bucket');
+            $this->org = config('services.influxdb.org');
         } catch (\Exception $e) {
             $this->logger->logException($e, null);
         }

@@ -46,9 +46,13 @@ npm install
 # 4. Configure Environment
 Make a .env as a copy of .env.example file. Make sure to configure the .env file with the necessary API keys and settings, including:
 
+APP_ENV (if you are running project using docker set it as production)
+
 Swop.cx API key
 
 Redis configuration
+
+influxdb configuration
 
 # 5. Run the Application with Docker
 You can run the application in a Docker container for consistent deployment:
